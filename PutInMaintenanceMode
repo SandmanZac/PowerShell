@@ -1,0 +1,45 @@
+$server = "tsxmail1903"
+$backupServer = "tsxmail1901.houstontranstar.org"
+
+Set-ServerComponentState $server -Component HubTransport -State Draining -Requester Maintenance | Out-File -FilePath c:\temp\$server.txt -Append
+Start-Sleep -Seconds 10
+
+# restart transport service for each server
+Get-Service -ComputerName $server MSExchangeTransport | Restart-Service | Out-File -FilePath c:\temp\$server.txt -Append
+Start-Sleep -Seconds 10
+
+# check transport service
+Get-Service -ComputerName $server MSExchangeTransport | Out-File -FilePath c:\temp\$server.txt -Append
+Start-Sleep -Seconds 10
+
+#change directory path
+$exscripts = “C:\Program Files\Microsoft\Exchange Server\V15\scripts”
+Set-Location $exscripts
+.\StartDagServerMaintenance.ps1 -serverName $server -MoveComment Maintenance -PauseClusterNode | Out-File -FilePath c:\temp\$server.txt -Append
+
+# Redirect message queue (message queue is moved to another server)
+Redirect-Message -Server $server -Target $backupServer | Out-File -FilePath c:\temp\$server.txt -Append
+Start-Sleep -Seconds 10
+
+# Set component state
+Set-ServerComponentState $server -Component ServerWideOffline -State Inactive -Requester Maintenance | Out-File -FilePath c:\temp\$server.txt -Append
+Start-Sleep -Seconds 10
+
+# check component state
+Get-ServerComponentState $server | ft Component,State -AutoSize | Out-File -FilePath c:\temp\$server.txt -Append
+Start-Sleep -Seconds 15
+
+# verify we're not hosting any active database copies
+Get-MailboxServer $server | Format-List DatabaseCopyAutoActivationPolicy
+Start-Sleep -Seconds 15
+
+# check cluster status
+Get-ClusterNode $server | fl
+Start-Sleep -Seconds 15
+
+#check queues
+Get-Queue -Server $server | Out-File -FilePath c:\temp\$server.txt -Append
+Start-Sleep -Seconds 10
+
+#check servers in maintenace mode
+Get-databaseavailabilitygroup -status | fl name,ServersInMaintenance

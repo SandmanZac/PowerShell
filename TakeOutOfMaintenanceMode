@@ -1,0 +1,57 @@
+$server = "tsxmail1903"
+
+# restart transport service for each server
+#Get-Service -ComputerName $server MSExchangeTransport | Restart-Service | Out-File -FilePath c:\temp\$server.txt -Append
+#Start-Sleep -Seconds 10
+
+# check transport service
+#Get-Service -ComputerName $server MSExchangeTransport | Out-File -FilePath c:\temp\$server.txt -Append
+#Start-Sleep -Seconds 10
+
+# Redirect message queue (message queue is moved to another server)
+#Redirect-Message -Server $server -Target $backupServer | Out-File -FilePath c:\temp\$server.txt -Append
+#Start-Sleep -Seconds 10
+
+
+
+
+# Set component state
+Set-ServerComponentState $server -Component ServerWideOffline -State Active -Requester Maintenance | Out-File -FilePath c:\temp\$server.txt -Append
+Start-Sleep -Seconds 10
+
+#check queues
+Get-Queue -Server $server | Out-File -FilePath c:\temp\$server.txt -Append
+Start-Sleep -Seconds 10
+
+#change directory path
+$exscripts = “C:\Program Files\Microsoft\Exchange Server\V15\scripts”
+Set-Location $exscripts
+.\StopDagServerMaintenance.ps1 -serverName $server | Out-File -FilePath c:\temp\$server.txt -Append
+
+# Enable Transport Queues
+Set-ServerComponentState $server -Component HubTransport -State Active -Requester Maintenance | Out-File -FilePath c:\temp\$server.txt -Append
+Start-Sleep -Seconds 10
+
+# restart transport service
+Get-Service -ComputerName $server MSExchangeTransport | Restart-Service | Out-File -FilePath c:\temp\$server.txt -Append
+Start-Sleep -Seconds 10
+
+#check servers in maintenace mode
+Get-databaseavailabilitygroup -status | fl name,ServersInMaintenance
+Start-Sleep -Seconds 10
+
+#check Cluster Status
+Get-ClusterNodes | fl
+Start-Sleep -Seconds 10
+
+# check component state
+Get-ServerComponentState $server | ft Component,State -AutoSize | Out-File -FilePath c:\temp\$server.txt -Append
+Start-Sleep -Seconds 10
+
+# Check service health
+Test-ServiceHealth $server
+Start-Sleep - Seconds 10
+
+# Check service health
+Test-ReplicationHealth -Server $server
+Start-Sleep - Seconds 10
