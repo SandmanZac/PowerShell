@@ -1,4 +1,4 @@
-$DNSServers = "192.168.1.2,192.168.1.3"
+$DNSServers = "192.168.1.2","192.168.1.3"
 $Scopes = Get-DhcpServerv4Scope
 
 foreach ($Scope in $Scopes) {
