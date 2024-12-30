@@ -1,0 +1,25 @@
+# Need to be a member of Schema Admins and Enterprise Admins
+
+# Install Visual C++ Redistributable for Visual Studio 2015
+https://www.microsoft.com/download/details.aspx?id=48145
+
+# Install Microsoft .NET Framework 4.5.2.
+https://www.microsoft.com/download/details.aspx?id=42643
+
+# Add roles and features for Mailbox
+Install-WindowsFeature Web-Server, Web-Mgmt-Tools, Web-Mgmt-Console, Web-WebServer, Web-Common-Http, Web-Default-Doc, Web-Static-Content, Web-Performance, Web-Stat-Compression, Web-Dyn-Compression, Web-Security, Web-Filtering, Web-Windows-Auth, Web-App-Dev, Web-Net-Ext45, Web-Asp-Net45, Web-ISAPI-Ext, Web-ISAPI-Filter, Web-Includes, InkandHandwritingServices, Windows-Identity-Foundation
+
+# Install Exchange via the last CU released
+# https://learn.microsoft.com/en-us/exchange/new-features/build-numbers-and-release-dates?view=exchserver-2019#exchange-server-2019
+# Not the ones that end in SU
+ExchangeServer2019-x64-CU12.ISO
+# Mount the ISO.  Assuming it's mounted as E:
+E:\Setup.exe /IAcceptExchangeServerLicenseTerms_DiagnosticDataOFF /mode:Install /r:MB
+
+# Search for the latest Exchange 2013 Security Update
+# https://learn.microsoft.com/en-us/exchange/new-features/build-numbers-and-release-dates?view=exchserver-2019#exchange-server-2019
+# Now grab the latest that ends with SU
+Exchange2019-KB5024296-x64-en
+
+# Set Message Tracking Log to 90 days instead of 30
+Get-TransportService | Set-TransportService -MessageTrackingLogMaxAge 90
