@@ -4,7 +4,7 @@ $mailboxes = get-mailbox -resultsize unlimited
 foreach ($mailbox in $mailboxes) {
   $alias = $mailbox.alias
   $newPrimaryAddress = $alias + "@guadalupetx.gov"
-  $cmd="Set-Mailbox " + $alias + " -PrimarySmtpAddress " + $newPrimaryAddress + " -EmailAddressPolicyEnabled:`$false -ErrorAction SilentlyContinue"
-  write-host $cmd
-  set-mailbox $alias -primarysmtpaddress $newPrimaryAddress -EmailAddressPolicyEnabled:$false -ErrorAction SilentlyContinue
+  set-mailbox $alias -EmailAddresses @{Add=$newPrimaryAddress} -ErrorAction SilentlyContinue
+  set-mailbox $alias -primarysmtpaddress $newPrimaryAddress -ErrorAction SilentlyContinue
+  set-mailbox $alias -EmailAddressPolicyEnabled:$false -ErrorAction SilentlyContinue
 }
