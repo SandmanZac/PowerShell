@@ -28,7 +28,7 @@ cmd.exe /c winrm set "winrm/config/client" '@{AllowUnencrypted="true"}'
 cmd.exe /c winrm set "winrm/config/service/auth" '@{Basic="true"}'
 cmd.exe /c winrm set "winrm/config/client/auth" '@{Basic="true"}'
 cmd.exe /c winrm set "winrm/config/service/auth" '@{CredSSP="true"}'
-cmd.exe /c winrm set "winrm/config/listener?Address=*+Transport=HTTPS" "@{Port=`"5986`";Hostname=`"whateveryouwant`";CertificateThumbprint=`"$($Cert.Thumbprint)`"}"
+cmd.exe /c winrm set "winrm/config/listener?Address=*+Transport=HTTPS" "@{Port=`"5986`";Hostname=`"vagrant`";CertificateThumbprint=`"$($Cert.Thumbprint)`"}"
 cmd.exe /c netsh advfirewall firewall set rule group="remote administration" new enable=yes
 cmd.exe /c netsh firewall add portopening TCP 5986 "Port 5986"
 cmd.exe /c net stop winrm
